@@ -1,0 +1,45 @@
+context:
+  version: "0.1.0"
+
+package:
+  name: dots-bootstrap
+  version: ${{ version }}
+
+source:
+  - path: .
+
+build:
+  number: 0
+  script:
+    - if: unix
+      then:
+        - export CGO_ENABLED=0
+        - go build -o "$PREFIX/bin/dots-bootstrap" ./cmd/dots-bootstrap
+        - mkdir -p "$PREFIX/share/dots-bootstrap"
+        - cp bootstrap.nu "$PREFIX/share/dots-bootstrap/bootstrap.nu"
+    - if: win
+      then:
+        - set CGO_ENABLED=0
+        - go build -o "%LIBRARY_BIN%\dots-bootstrap.exe" .\cmd\dots-bootstrap
+        - mkdir "%LIBRARY_PREFIX%\share\dots-bootstrap"
+        - copy bootstrap.nu "%LIBRARY_PREFIX%\share\dots-bootstrap\bootstrap.nu"
+
+requirements:
+  build:
+    - ${{ compiler('go-nocgo') }}
+  run:
+    - nushell
+    - git
+    - git-lfs
+    - gh
+    - uutils-coreutils
+
+tests:
+  - script:
+      - dots-bootstrap --help
+
+about:
+  homepage: https://github.com/jackm97/dots-bootstrap
+  summary: Bootstrap a machine from your dotfiles repo
+  license: MIT
+  license_file: LICENSE
